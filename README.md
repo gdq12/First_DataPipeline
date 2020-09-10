@@ -1,9 +1,10 @@
-The purpose of this week's project was to build a data pipeline consisting of reading out specific tweets based on a filter from the twitter API stream listener. This extensive pipeline is facilitated by docker. The general outline of these steps are as follows:
+Principle objective of this project is to build a dockerized Data Pipeline that analyzes tweet sentiments and send them to slackbot for hourly reporting. The pipeline is executed and facilitated via Docker-Compose, a tool used to build and run multiple containers in an "orchestrated" sequential format. This is executed via a docker-compose.yaml in 1 directory above each of the container subdirectory folders. This yaml file consists of instructions for building each container in the pipeline, whether it maybe going into each sub directory to execute a respective docker file and build the container from scratch, or downloading an image from docker hub to build a container based on a prebuilt container provided by the docker community. The following is a brief description of each container and their principle role in the pipeline.
 
-1. extract the necessary dictionaries from each tweets json file using the twitter stream listener using a specified filter, in this case any tweet in english and mentioning Berlin
-2. import all this into a mongo data base, keeping only the desired info
-3. retrieving these dictionary items from mongo database, calculating each tweets' sentiment score and taking this (along with the info from mongo database) and transferring it to a postgres database
-4. execute specific queries based on a defined time period and have them printed into a channel on slack using a slack bot
+- Tweepy: connects to twitter streaming api to read and collected filtered incoming tweets
+- Mongo Database: receives and stores the json format tweets within its collection.
+- ETL: container that extracts tweet info from the mongo database, calculates the sentiment factor of each tweet and transforms it to postgres friendly format and then loads it into a postgres table within its database.
+- Postgres Database: receives processed tweets from ETL container.
+- Slack Bot: executes specific sql queries and reformats them as strings for the slack bot to print in a slack channel.
 
 All these steps should be successful with the DockerCompile directory and all its contents on any operating system having docker. Further detail on the role each container plays in the data pipeline can be found in README files within each container directory.
 
