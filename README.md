@@ -13,3 +13,7 @@ All these steps should be successful with the DockerCompile directory and all it
 As an example what the final result may look like:
 
 ![botScreenShot](slack_example.png)
+
+**Quick Note:**
+
+Template configurations files placed in [Tweepy](DockerCompile/TweepyContainer/config_template.py) and [Slack](DockerCompile/slackyContainer/config_template.py) containers. Once one has the respective information to run the pipeline, this info should be placed into the respective quotations and config_template.py should be changed to config.py
