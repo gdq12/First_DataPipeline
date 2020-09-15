@@ -1,4 +1,1 @@
-CONSUMER_API_KEY='testing123'
-CONSUMER_API_SECRET='testing123'
-ACCESS_TOKEN='testing123'
-ACCESS_TOKEN_SECRET='testing123'
+blah blah blah
