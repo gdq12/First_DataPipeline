@@ -132,5 +132,3 @@ dmypy.json
 .DS_Store
 
 #private configuration files
-/Users/gdquiceno2/git_repos/First_DataPipeline/DockerCompile/TweepyContainer/config.py
-/Users/gdquiceno2/git_repos/First_DataPipeline/DockerCompile/slackyContainer/config.py

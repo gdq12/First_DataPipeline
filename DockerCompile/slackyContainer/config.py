@@ -1,2 +1,2 @@
-OauthToken='testing123'
-channel='testing123'
+OauthToken=''
+channel=''
