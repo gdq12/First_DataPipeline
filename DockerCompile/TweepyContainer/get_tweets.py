@@ -7,15 +7,13 @@ import logging
 from pymongo import MongoClient
 from datetime import datetime
 
-#create connection to mongodb
-client=MongoClient(host='my_mongodb', port=27017) #connex to mongodb container in docker-compose
-db=client.twitter #creating the db in mongodb
-tweets=db.tweets #creating the collection that will store all in the dictionaries within db in mongo
-
+client=MongoClient(host='my_mongodb', port=27017)
+db=client.twitter
+tweets=db.tweets
 
 def authenticate():
     """
-    To create authentication token for twitter, the necessary credentials should be in the config.py file
+    To create authentication token for twitter.
     """
     auth = OAuthHandler(config.CONSUMER_API_KEY, config.CONSUMER_API_SECRET)
     auth.set_access_token(config.ACCESS_TOKEN, config.ACCESS_TOKEN_SECRET)
@@ -23,13 +21,14 @@ def authenticate():
     return auth
 
 class TwitterListener(StreamListener):
-#this is a function that retrieves data from every tweet by scanning specific tweets based on filter
+    '''
+    Retrieve json based on filter from Twitter API, store specified "chunks"
+    to MonogoDB.
+    '''
     def on_data(self, data):
-    #retrieves data from StreamListener on_status method
-        t = json.loads(data) #all meta data from tweet saved into a json dictionary
-        logging.warning('---------------Incoming Tweet!!!!!!---------------') #print message in terminal tweet detected
+        t = json.loads(data)
+        logging.warning('---------------Incoming Tweet!!!!!!---------------')
 
-        #extract all desired info from dictionary for mongo
         hashtags=[]
 
         if t['created_at'] != None:
@@ -66,12 +65,13 @@ class TwitterListener(StreamListener):
         else:
             text=t['text']
 
-        #save specific info into custom dictionary for mongodb
-        tweet = {'User time':timeStamp, 'tweepy time':datetime.utcnow(), 'user':user, 'username':username, 'location':location, 'hashtags':hashtags,'text':text}
+        tweet = {'User time':timeStamp, 'tweepy time':datetime.utcnow(),\
+        'user':user, 'username':username, 'location':location,\
+        'hashtags':hashtags,'text':text}
 
-        tweets.insert_many([tweet]) #to add tweet dictionary into mongodb collection
-        logging.critical('Successfully added to mongoDB!!!!!!!') #indicate in terminal data transfered to mongodb container
-        logging.warning('-------------------------------------') #asthetic printing for terminal
+        tweets.insert_many([tweet])
+        logging.critical('Successfully added to mongoDB!!!!!!!')
+        logging.warning('-------------------------------------')
 
     def on_error(self, status):
         if status == 420:
@@ -88,5 +88,10 @@ if __name__ == '__main__':
     auth = authenticate()
     listener = TwitterListener()
     stream = Stream(auth, listener)
-    stream.filter(track=['berlin'], languages=['en'])
-    # can customize filter to any other word
+    while True:
+        try:
+            stream.filter(track=['berlin'], languages=['en'], stall_warnings=True)
+        except:
+            logging.critical('---Problem with streamer, reinitiate in 10 seconds---')
+            time.sleep(10)
+            continue

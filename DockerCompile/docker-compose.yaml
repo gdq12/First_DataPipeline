@@ -1,36 +1,37 @@
-#identify the version number of the docker composer that wish to use
 version: '3'
 
-# identify the container that should be built from the sub directories in this main directory
 services:
-  # container1
-  tweet_collector: #name of the container for tweepy
-    build: TweepyContainer/ #look for the Dockerfile within this sub directory to build the tweepy container
-    depends_on: #apparantly better than links?
-      - my_mongodb # indicating this tweepy container should be connected to the db container for data trafficking and also that the db container should be built prior to this tweep y container
+  tweet_collector:
+    build: TweepyContainer/
+    volumes:
+      - ./TweepyContainer/:/TweepyContainer
+    depends_on:
+      - my_mongodb
 
-  # container2
-  my_mongodb:
-    image: mongo #load image from docker hub
+  airflow:
+    build: airflow/
+    volumes:
+      - ./airflow/dags/:/usr/local/airflow/dags/
+      - ./airflow/requirements.txt:/usr/local/airflow/requirements.txt
     ports:
-      - 27017:27017 #mongodbport:containerport ?
-
-  # container3
-  my_etl:
-    build: etlContainer/
+      - "8081:8080"
+    command: ["webserver", "scheduler"]
     depends_on:
       - my_mongodb
       - my_postgresdb
 
-  # container 4
+  my_mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+
   my_postgresdb:
-    image: postgres #retrieve image from docker hub
-    environment: #credentials and environment needed by tweepy python script for importing data into postgres db
+    image: postgres
+    environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=xxxx
     ports:
-      - 5555:5432 #localhost:containerport
+      - 5555:5432
 
-  # container5
   slacky:
     build: slackyContainer/
